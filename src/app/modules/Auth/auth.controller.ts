@@ -33,7 +33,7 @@ const refreshToken: RequestHandler = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Logged in Successfully!",
+      message: "Access Token Generated Successfully!",
       data: result,
       //   data: {
       //     accessToken: result.accessToken,
@@ -43,7 +43,52 @@ const refreshToken: RequestHandler = catchAsync(
   }
 );
 
+const changePassword: RequestHandler = catchAsync(
+  async (req: Request & { user?: any }, res: Response) => {
+    const user = req.user;
+    const result = await AuthServices.changePassword(user, req.body);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Password Change Successfully!",
+      data: result,
+    });
+  }
+);
+
+const forgotPassword: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await AuthServices.forgotPassword(req.body);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Check Your Email",
+      data: null,
+    });
+  }
+);
+
+const resetPassword: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const token = req.headers.authorization || " ";
+
+    const result = await AuthServices.resetPassword(token, req.body);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Password Reset",
+      data: null,
+    });
+  }
+);
+
 export const AuthController = {
   loginUser,
   refreshToken,
+  changePassword,
+  forgotPassword,
+  resetPassword,
 };
