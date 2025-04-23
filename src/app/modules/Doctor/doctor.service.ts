@@ -170,38 +170,65 @@ const getByIdFromDB = async (id: string): Promise<Doctor | null> => {
 // };
 
 const updateIntoDB = async (id: string, payload: any) => {
-  const { specialties, ...doctorData } = payload;
-  console.log("Specialties", specialties);
-  console.log("Doctor Data", doctorData);
+  const { specialities, ...doctorData } = payload;
+
   const doctorInfo = await prisma.doctor.findUniqueOrThrow({
-    where: {
-      id,
-    },
+    where: { id },
   });
 
-  const result = await prisma.$transaction(async (transactionClient) => {
+  await prisma.$transaction(async (transactionClient) => {
     const updateDoctorData = await transactionClient.doctor.update({
-      where: {
-        id,
-      },
+      where: { id },
       data: doctorData,
       include: {
         doctorSpecialties: true,
       },
     });
 
-    for (const specialitiesId of specialties) {
-      const createDoctorSpecialties =
+    if (specialities && specialities.length > 0) {
+      // Delete
+      const deleteSpecialtiesIds = specialities.filter(
+        (specialty) => specialty.isDeleted
+      );
+
+      for (const specialty of deleteSpecialtiesIds) {
+        await transactionClient.doctorSpecialties.deleteMany({
+          where: {
+            doctorId: doctorInfo.id,
+            specialitiesId: specialty.specialtiesId,
+          },
+        });
+      }
+
+      // Create
+      const createSpecialtiesIds = specialities.filter(
+        (specialty) => !specialty.isDeleted
+      );
+
+      for (const speciality of createSpecialtiesIds) {
         await transactionClient.doctorSpecialties.create({
           data: {
             doctorId: doctorInfo.id,
-            specialitiesId: specialitiesId,
+            specialitiesId: speciality.specialitiesId,
           },
         });
+      }
     }
-    return updateDoctorData
+
   });
 
+  const result = await prisma.doctor.findUnique({
+    where: {
+      id: doctorInfo.id,
+    },
+    include: {
+      doctorSpecialties: {
+        include: {
+          specialities: true,
+        },
+      },
+    },
+  });
   return result;
 };
 
