@@ -24,26 +24,26 @@ const createAppointment = catchAsync(
   }
 );
 
-// const getMyAppointment = catchAsync(
-//   async (req: Request & { user?: IAuthUser }, res: Response) => {
-//     const user = req.user;
-//     const filters = pick(req.query, ["status", "paymentStatus"]);
-//     const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+const getMyAppointment = catchAsync(
+  async (req: Request & { user?: IAuthUser }, res: Response) => {
+    const user = req.user;
+    const filters = pick(req.query, ["status", "paymentStatus"]);
+    const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
 
-//     const result = await AppointmentService.getMyAppointment(
-//       user as IAuthUser,
-//       filters,
-//       options
-//     );
+    const result = await AppointmentService.getMyAppointment(
+      user as IAuthUser,
+      filters,
+      options
+    );
 
-//     sendResponse(res, {
-//       statusCode: httpStatus.OK,
-//       success: true,
-//       message: "My Appointment retrive successfully",
-//       data: result,
-//     });
-//   }
-// );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "My Appointment retrive successfully",
+      data: result,
+    });
+  }
+);
 
 // const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
 //   const filters = pick(req.query, appointmentFilterableFields);
@@ -60,6 +60,6 @@ const createAppointment = catchAsync(
 
 export const AppointmentController = {
   createAppointment,
-//   getMyAppointment,
-//   getAllFromDB,
+  getMyAppointment,
+  //   getAllFromDB,
 };
