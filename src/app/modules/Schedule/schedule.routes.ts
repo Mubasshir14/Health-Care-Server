@@ -11,10 +11,18 @@ router.post(
   ScheduleController.inserIntoDB
 );
 
+router.get("/", auth(UserRole.DOCTOR), ScheduleController.getAllFromDb);
+
 router.get(
-  "/",
-  auth(UserRole.DOCTOR),
-  ScheduleController.getAllFromDb
+  "/:id",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DOCTOR),
+  ScheduleController.getByIdFromDB
+);
+
+router.delete(
+  "/:id",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  ScheduleController.deleteFromDB
 );
 
 export const ScheduleRoutes = router;
